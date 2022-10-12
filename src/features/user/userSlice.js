@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit"
-import { login, registerUser, refresh } from "./userActions"
+import { login, register, refresh, logout } from "./userActions"
 
 // const accessToken = localStorage.getItem("access")
 // 	? localStorage.getItem("access")
@@ -20,13 +20,13 @@ const userSlice = createSlice({
 	extraReducers: (builder) => {
 		builder
 			// register user
-			.addCase(registerUser.pending, (state) => {
+			.addCase(register.pending, (state) => {
 				state.loading = true
 			})
-			.addCase(registerUser.fulfilled, (state ) => {
+			.addCase(register.fulfilled, (state) => {
 				state.loading = false
 			})
-			.addCase(registerUser.rejected, (state, action) => {
+			.addCase(register.rejected, (state, action) => {
 				;(state.loading = false), (state.errors = action.payload)
 			})
 			// login user
@@ -39,6 +39,7 @@ const userSlice = createSlice({
 			.addCase(login.rejected, (state, action) => {
 				;(state.loading = false), (state.errors = action.payload)
 			})
+			// refresh token
 			.addCase(refresh.pending, (state) => {
 				state.loading = true
 			})
@@ -48,7 +49,19 @@ const userSlice = createSlice({
 			.addCase(refresh.rejected, (state, action) => {
 				;(state.loading = false), (state.errors = action.payload)
 			})
+			// logout user
+			.addCase(logout.pending, (state) => {
+				state.loading = true
+			})
+			.addCase(logout.fulfilled, (state) => {
+				;(state.loading = false), (state.accessToken = null)
+			})
+			.addCase(logout.rejected, (state, action) => {
+				;(state.loading = false), (state.errors = action.payload)
+			})
 	},
 })
+
+export const { setCredentials } = userSlice.actions
 
 export default userSlice.reducer

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react"
+import React, { useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { Navigate, Outlet, useLocation } from "react-router-dom"
 import { toast } from "react-toastify"
@@ -7,24 +7,26 @@ import { refresh } from "../../features/user/userActions"
 
 const PersistLogin = () => {
 	const location = useLocation()
-	const { accessToken,loading } = useSelector((state) => state.user)
+	const { accessToken } = useSelector((state) => state.user)
 	const dispatch = useDispatch()
+	const [loading, setLoading] = useState(true)
 
 	useEffect(() => {
+		let isMounted = true
 		const verifyRefresh = async () => {
-			const response = await dispatch(refresh())
-			if (refresh.rejected.match(response)) {
-				toast.info("please login again!")
-				;<Navigate to='/login' state={{ from: location }} replace />
+			try {
+				
+				await dispatch(refresh())
+			} catch (error) {
+				toast.info("please log in again")
+			} finally {
+				isMounted && setLoading(false)
 			}
 		}
 
-		let isMounted = true
-		if (!accessToken) {
-			isMounted && verifyRefresh()
-		}
+		!accessToken && isMounted ? verifyRefresh() : setLoading(false);
 		return () => (isMounted = false)
-	}, [dispatch, accessToken])
+	}, [loading])
 
 	return loading ? (
 		<Loader />

@@ -1,15 +1,17 @@
 import { createAsyncThunk } from "@reduxjs/toolkit"
-import axios from "axios"
 import { toast } from "react-toastify"
 import { axiosPrivate } from "../../api/axiosInstance"
 
-export const registerUser = createAsyncThunk(
+export const register = createAsyncThunk(
 	"user/register",
 	async (userData, { rejectWithValue }) => {
 		try {
-			await axios.post("url", userData)
+			await axiosPrivate.post("/user/register/", userData)
+			toast.success("successfully registered")
 		} catch (error) {
-			rejectWithValue(error.response?.data.message)
+			console.log(error)
+			toast.error("registration failed")
+			return rejectWithValue(error.response?.data.message)
 		}
 	}
 )
@@ -22,23 +24,31 @@ export const login = createAsyncThunk(
 			toast.success("successfully logged in")
 			return response.data
 		} catch (error) {
-			console.log(error)
 			toast.error("invalid credentials!")
 			return rejectWithValue(error.response?.data.detail)
 		}
 	}
 )
 
-
 export const refresh = createAsyncThunk(
-    "user/refresh",
-    async (_,{ rejectWithValue }) => {
-        try {
-            const response = await axiosPrivate.post("auth/token/refresh/")
-            return response.data
-        } catch (error) {
-			console.log(error)
-            return rejectWithValue(error.response?.data.detail)
-        }
-    }
+	"user/refresh",
+	async (_, { rejectWithValue }) => {
+		try {
+			const response = await axiosPrivate.post("auth/token/refresh/")
+			return response.data
+		} catch (error) {
+			return rejectWithValue(error.response?.data.detail)
+		}
+	}
+)
+
+export const logout = createAsyncThunk(
+	"user/logout",
+	async (_, { rejectWithValue }) => {
+		try {
+			await axiosPrivate.post("/auth/logout/")
+		} catch (error) {
+			return rejectWithValue(error.response?.data.detail)
+		}
+	}
 )

@@ -1,17 +1,15 @@
 import React from "react"
 import { Formik, Form } from "formik"
 import { FaPaintBrush } from "react-icons/fa"
-import LoginSchema from "../validation/login.validation"
 import TextInput from "./TextInput"
 import { useDispatch } from "react-redux"
-import { Link, useLocation, useNavigate } from "react-router-dom"
-import { login } from "../features/user/userActions"
+import { Link, useNavigate } from "react-router-dom"
+import { register } from "../features/user/userActions"
+import RegistrationSchema from "../validation/registration.validation"
 
-const LoginForm = () => {
+const RegistrationForm = () => {
 	const dispatch = useDispatch()
-	const location = useLocation()
 	const navigate = useNavigate()
-	const from = location.state?.from?.pathname || "/"
 
 	return (
 		<>
@@ -24,18 +22,26 @@ const LoginForm = () => {
 				<Formik
 					initialValues={{
 						email: "",
+						username: "",
 						password: "",
+						// confirmPassword: "",
 					}}
-					validationSchema={LoginSchema}
+					validationSchema={RegistrationSchema}
 					onSubmit={async (values, { setSubmitting }) => {
-						const response = await dispatch(login(values))
-						if (login.fulfilled.match(response)) {
-							navigate(from, { replace: true })
+						const response = await dispatch(register(values))
+						if (register.fulfilled.match(response)) {
+							navigate("/login", { replace: true })
 						}
 						setSubmitting(false)
 					}}
 				>
 					<Form>
+						<TextInput
+							label='Username'
+							name='username'
+							type='text'
+							placeholder='username'
+						/>
 						<TextInput
 							label='Email'
 							name='email'
@@ -48,20 +54,26 @@ const LoginForm = () => {
 							type='password'
 							placeholder='password'
 						/>
+						<TextInput
+							label='Confirm Password'
+							name='confirmPassword'
+							type='password'
+							placeholder='confirm password'
+						/>
 						<button
 							className='w-full flex items-center justify-center p-1 rounded bg-fuchsia-600 text-white mt-4 font-semibold hover:opacity-95'
 							type='submit'
 						>
-							Login
+							Submit
 						</button>
 						<div className='w-full'>
 							<p className='w-full text-center py-3 text-sm italic'>
-								don't have an account?{" "}
+								already have an account?{" "}
 								<Link
-									to='/register'
+									to='/login'
 									className='font-medium not-italic text-fuchsia-700 underline'
 								>
-									Register
+									Login
 								</Link>
 							</p>
 						</div>
@@ -72,4 +84,4 @@ const LoginForm = () => {
 	)
 }
 
-export default LoginForm
+export default RegistrationForm
